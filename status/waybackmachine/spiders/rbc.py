@@ -9,10 +9,10 @@ from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 
-from src.cdx import WaybackMachineCDX
-from src.waybackmachine.items import WaybackMachineGeneralArticleItem
-from src.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
-                                             WaybackMachineResponseCDX)
+from status.cdx import WaybackMachineCDX
+from status.waybackmachine.items import WaybackMachineGeneralArticleItem
+from status.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
+                                                WaybackMachineResponseCDX)
 
 logger = logging.getLogger(__file__)
 

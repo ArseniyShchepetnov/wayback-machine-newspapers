@@ -6,7 +6,7 @@ from typing import List
 
 import pandas as pd
 import requests
-from src.cdx import WaybackMachineCDX
+from status.cdx import WaybackMachineCDX
 
 logger = logging.getLogger(__name__)
 
