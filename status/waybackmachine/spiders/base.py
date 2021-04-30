@@ -12,7 +12,7 @@ import pandas as pd
 import parse
 import scrapy
 
-from src.cdx import WaybackMachineCDX
+from status.cdx import WaybackMachineCDX
 
 logger = logging.getLogger(__name__)
 

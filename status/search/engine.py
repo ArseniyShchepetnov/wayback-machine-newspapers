@@ -7,7 +7,7 @@ from whoosh.fields import ID, TEXT, Schema
 from whoosh.index import create_in
 from whoosh.qparser import QueryParser
 
-from src.search.items import JsonDocumentItem
+from status.search.items import JsonDocumentItem
 
 
 class SearchEngineFileSystem:
@@ -18,7 +18,7 @@ class SearchEngineFileSystem:
                     path=ID(stored=True, unique=True))
 
     def __init__(self,
-                 path,
+                 path: str,
                  index_dir: Optional[str] = None):
 
         self._path = path
