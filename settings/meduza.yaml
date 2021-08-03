@@ -1,0 +1,17 @@
+cdx:
+  url: https://meduza.io/galleries/2015/11/17/ot-sveta-k-tme
+  from_dt: "2019-01-01 00:00:00"
+  limit: 10000
+  matchType: "prefix"
+filter:
+  include_url:
+  # - https://www.rbc.ru/politics
+  # - https://www.rbc.ru/gorod
+  # - https://www.rbc.ru/economics
+  # - https://www.rbc.ru/rbcfreenews
+  # - https://www.rbc.ru/finances
+  exclude_url:
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/{0,1}\s*$
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/games\s*$
+  exclude_statuscodes: ["404"]
+  include_mimetypes: ["text/html"]
