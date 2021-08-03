@@ -3,16 +3,18 @@ import itertools
 import json
 import logging
 import os
+import re
 from datetime import datetime
 from typing import Optional
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
-
-from status.cdx import WaybackMachineCDX
-from status.waybackmachine.items import WaybackMachineGeneralArticleItem
-from status.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
-                                                WaybackMachineResponseCDX)
+from paperworld.cdx import WaybackMachineCDX
+from paperworld.utils.timestamp import timestamp_month_ru2en
+from paperworld.waybackmachine.items import WaybackMachineGeneralArticleItem
+from paperworld.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
+                                                    WaybackMachineResponseCDX)
+from paperworld.waybackmachine.spiders.utils import check_tag_attr_re
 
 logger = logging.getLogger(__file__)
 
@@ -21,64 +23,140 @@ class SpiderMeduza(SpiderWaybackMachineBase):
 
     name = "spider_meduza"
 
-    def __init__(self,
-                 from_datetime: Optional[datetime] = None,
-                 to_datetime: Optional[datetime] = None,
-                 limit: int = 1000,
-                 outdir: str = "~/data/meduza",
-                 *args, **kwargs):
+    _rm_pat = re.compile("^(?:DonatesTeaser|RelatedBlock).*")
+    _pat_class_2 = re.compile("^style__Material.*")
+    _pat_class_par_2 = re.compile("^style__Paragraph.*")
 
-        from_datetime = datetime(2019, 1, 1, 0, 0, 0)
-        cdx = WaybackMachineCDX('meduza.io/feature',
-                                from_dt=from_datetime,
-                                to_dt=to_datetime,
-                                limit=limit,
-                                matchType='prefix')
+    def _article_remove_filter(self, tag):
+        result = False
 
-        super().__init__(cdx,
-                         ignore_statuscode=["404"],
-                         *args, **kwargs)
+        if tag.name == 'div' and tag.has_attr('class'):
+            for cur in tag.attrs['class']:
+                if self._rm_pat.match(cur):
+                    result = True
+                    break
 
-        self.outdir = os.path.expanduser(outdir)
+        return result
+
+    def _get_article_timestamp(self, tag):
+
+        timestamp_tags = tag.find_all('time')
+
+        if len(timestamp_tags) > 1:
+            logger.warning("Multiple timestamp tags detected.")
+
+        timestamp = timestamp_tags[0].text
+
+        return timestamp
+
+    def _parse_1(self, soup: BeautifulSoup, url: str):
+
+        article = soup.html.body.find('div',
+                                      {'class': "GeneralMaterial-article"})
+
+        title = soup.html.head.title.text
+
+        publish_date = self._get_article_timestamp(soup.html.body)
+
+        tag_banner_ino = article.find_all('div', {'id': 'div-gpt-ad'})
+        for tag in tag_banner_ino:
+            tag.decompose()
+
+        tag_other = article.find_all(self._article_remove_filter)
+        for tag in tag_other:
+            tag.decompose()
+
+        text = article.get_text("\n")
+        text = normalize_string(text)
+
+        outpath = self.path_from_url(url)
+
+        url_pars = WaybackMachineResponseCDX.from_archive_url(url)
+
+        item = WaybackMachineGeneralArticleItem(
+            text=text,
+            title=title,
+            publish_date=publish_date,
+            title_date='',
+            url=url,
+            timestamp=url_pars['timestamp'],
+            original=url_pars['original'],
+            path=outpath
+        )
+
+        return item, outpath
+
+    def _parse_2(self, soup: BeautifulSoup, url: str):
+
+        article = soup.html.body.find(
+            lambda x: check_tag_attr_re(x, self._pat_class_2, 'class'))
+
+        par_tags = soup.find_all(
+            lambda tag: check_tag_attr_re(tag, self._pat_class_par_2, 'class')
+        )
+
+        text = [normalize_string(par.get_text()) for par in par_tags]
+        text = "\n".join(text)
+
+        title = soup.html.head.title.text
+
+        publish_date = self._get_article_timestamp(soup.html.body)
+
+        tag_banner_ino = article.find_all('div', {'id': 'div-gpt-ad'})
+        tag_banner_ino.decompose()
+
+        tag_other = article.find_all(self._article_remove_filter)
+        for tag in tag_other:
+            tag.decompose()
+
+        outpath = self.path_from_url(url)
+
+        url_pars = WaybackMachineResponseCDX.from_archive_url(url)
+
+        item = WaybackMachineGeneralArticleItem(
+            text=text,
+            title=title,
+            publish_date=publish_date,
+            title_date='',
+            url=url,
+            timestamp=url_pars['timestamp'],
+            original=url_pars['original'],
+            path=outpath
+        )
+
+        return item, outpath
 
     def parse(self, response):
         """Parse response."""
 
         soup = BeautifulSoup(response.text)
 
-        tag_text = soup.find("div", {"class": "GeneralMaterial-article"})
+        case_1 = soup.html.body.find(
+            'div', {'class': "GeneralMaterial-article"}
+        ) is not None
 
-        if tag_text is not None:
+        case_2 = soup.html.body.find(
+            lambda tag: check_tag_attr_re(tag, self._pat_class_2, 'class')
+        ) is not None
 
-            text = normalize_string(tag_text.text)
+        if case_1:
 
-            # tag_title = soup.find("div", {"class": "article__header__title"})
-            title = ''  # normalize_string(tag_title.text)
-
-            # soup.find("span", {"class": "article__header__date"})
-
-            publish_date = ''  # tag_date.get('content', '')
-            title_date = ''  # tag_date.text
-
-            outpath = self.path_from_url(response.url)
-
-            url_pars = WaybackMachineResponseCDX.from_archive_url(response.url)
-
-            item = WaybackMachineGeneralArticleItem(
-                text=text,
-                title=title,
-                publish_date=publish_date,
-                title_date=title_date,
-                url=response.url,
-                timestamp=url_pars['timestamp'],
-                original=url_pars['original'],
-                path=outpath
-            )
+            item, outpath = self._parse_1(soup, response.url)
 
             self.save_snapshot(response.text, outpath)
 
+            logger.info("FOUND TEXT: '%s'", outpath)
+
+        elif case_2:
+
+            item, outpath = self._parse_2(soup, response.url)
+
+            self.save_snapshot(response.text, outpath)
+
+            logger.info("FOUND TEXT: '%s'", outpath)
+
         else:
-            logger.info("No text found: '%s'", response.url)
+            logger.info("NO TEXT FOUND: '%s'", response.url)
             item = None
 
         return item
@@ -86,7 +164,7 @@ class SpiderMeduza(SpiderWaybackMachineBase):
     def path_from_url(self, url: str):
 
         subdir = url2path(url)
-        outpath = os.path.join(self.outdir, subdir)
+        outpath = os.path.join(self.scraper_outdir, subdir)
 
         if not os.path.exists(outpath):
             os.makedirs(outpath)
@@ -104,12 +182,6 @@ class SpiderMeduza(SpiderWaybackMachineBase):
         outpath = os.path.join(outpath, 'snapshot.html')
         with open(outpath, 'w', encoding='utf-8') as fobj:
             fobj.write(snapshot)
-
-    def filter_statuscode(self, statuscode: str):
-        return statuscode != '404'
-
-    def filter_mimetype(self, mimetype: str):
-        return mimetype == 'text/html'
 
 
 def url2path(url: str) -> str:
