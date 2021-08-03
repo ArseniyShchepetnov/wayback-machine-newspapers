@@ -1,76 +1,34 @@
 """Scraper for rbc.ru site from waybackmachine."""
-import itertools
 import json
 import logging
 import os
-from datetime import datetime
 from typing import Optional
 from urllib.parse import urlparse
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 
-from status.cdx import WaybackMachineCDX
-from status.waybackmachine.items import WaybackMachineGeneralArticleItem
-from status.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
-                                                WaybackMachineResponseCDX)
+from paperworld.waybackmachine.items import WaybackMachineGeneralArticleItem
+from paperworld.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
+                                                    WaybackMachineResponseCDX)
 
 logger = logging.getLogger(__file__)
 
 
-def generate_ignore():
-    http = ['http://', 'https://']
-    ports = ['', ':80']
-    rbc = ['www.rbc.ru', 'rbc.ru']
-    slash = ['', '/']
-
-    ignore = []
-    for h, r, p, s in itertools.product(http, rbc, ports, slash):
-        ignore.append(h + r + p + s)
-
-    return ignore
-
-
-ignore_list = generate_ignore()
-ignore_list.append('https://www.rbc.ru/ajax/')
-ignore_list.append('https://www.rbc.ru/advert/')
-ignore_list.append('https://www.rbc.ru/politics/')
-
-
 class SpiderRBC(SpiderWaybackMachineBase):
+    """rbc.ru pages parser."""
 
     name = "spider_rbc"
-
-    def __init__(self,
-                 from_datetime: Optional[datetime] = None,
-                 to_datetime: Optional[datetime] = None,
-                 limit: int = 1000,
-                 outdir: str = "~/data/rbc",
-                 *args, **kwargs):
-
-        from_datetime = datetime(2019, 1, 1, 0, 0, 0)
-        cdx = WaybackMachineCDX('rbc.ru/politics',
-                                from_dt=from_datetime,
-                                to_dt=to_datetime,
-                                limit=limit,
-                                matchType='prefix')
-
-        super().__init__(cdx,
-                         ignore_statuscode=["404"],
-                         ignore_list=ignore_list,
-                         *args, **kwargs)
-
-        self.outdir = os.path.expanduser(outdir)
 
     def parse(self, response):
         """Parse response."""
 
         soup = BeautifulSoup(response.text)
 
-        tag_text = soup.find("div", {"class": "article__text"})
+        text = find_text(soup)
 
-        if tag_text is not None:
+        if text is not None and len(text) > 0:
 
-            text = normalize_string(tag_text.text)
+            text = normalize_string(text)
 
             tag_title = soup.find("div", {"class": "article__header__title"})
             title = normalize_string(tag_title.text)
@@ -78,6 +36,10 @@ class SpiderRBC(SpiderWaybackMachineBase):
             tag_date = soup.find("span", {"class": "article__header__date"})
             publish_date = tag_date.get('content', '')
             title_date = tag_date.text
+
+            logger.info("Text found with title '%s' (date from title %s). "
+                        "Text length is %d",
+                        title, title_date, len(text))
 
             outpath = self.path_from_url(response.url)
 
@@ -97,6 +59,7 @@ class SpiderRBC(SpiderWaybackMachineBase):
             self.save_snapshot(response.text, outpath)
 
         else:
+
             logger.info("No text found: '%s'", response.url)
             item = None
 
@@ -105,7 +68,7 @@ class SpiderRBC(SpiderWaybackMachineBase):
     def path_from_url(self, url: str):
 
         subdir = url2path(url)
-        outpath = os.path.join(self.outdir, subdir)
+        outpath = os.path.join(self.scraper_outdir, subdir)
 
         if not os.path.exists(outpath):
             os.makedirs(outpath)
@@ -124,15 +87,34 @@ class SpiderRBC(SpiderWaybackMachineBase):
         with open(outpath, 'w', encoding='utf-8') as fobj:
             fobj.write(snapshot)
 
-    def filter_statuscode(self, statuscode: str):
-        return statuscode != '404'
 
-    def filter_url(self, url: str):
-        ignore = url not in ignore_list
-        return ignore
+def find_text(soup: BeautifulSoup) -> Optional[str]:
 
-    def filter_mimetype(self, mimetype: str):
-        return mimetype == 'text/html'
+    text_list = []
+    for tag in soup.find_all("div", {"class": "article__text"}):
+
+        if not isinstance(tag, NavigableString):
+
+            for string in soup.find_all("p"):
+                text = string.text
+                text_list.append(text)
+
+    counts = {}
+    for string in text_list:
+        n = counts.get(string)
+        if n is None:
+            counts[string] = 0
+        else:
+            counts[string] += 1
+
+    text_list = [key for key, val in counts.items() if val == 1]
+
+    if len(text_list) > 0:
+        text = "\n".join(text_list)
+    else:
+        text = None
+
+    return text
 
 
 def url2path(url: str) -> str:

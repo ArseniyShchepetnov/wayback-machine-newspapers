@@ -1,3 +1,4 @@
+import os
 # Scrapy settings for waybackmachine project
 #
 # For simplicity, this file contains only settings considered important or
@@ -45,7 +46,7 @@ ROBOTSTXT_OBEY = True
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 # SPIDER_MIDDLEWARES = {
-#    'waybackmachine.middlewares.WaybackmachineSpiderMiddleware': 543,
+#     'waybackmachine.middlewares.WaybackmachineSpiderMiddleware': 543,
 # }
 
 # Enable or disable downloader middlewares
@@ -86,3 +87,5 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+data_dir = os.path.expanduser("~/wbm_data/data")
