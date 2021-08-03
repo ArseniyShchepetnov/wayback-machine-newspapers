@@ -1,3 +1,3 @@
 """CDX module"""
-from status.cdx.cdx import WaybackMachineCDX
-from status.cdx.cdx_iterator import WaybackMachineIteratorCDX
+from paperworld.cdx.cdx import WaybackMachineCDX
+from paperworld.cdx.cdx_iterator import WaybackMachineIteratorCDX
