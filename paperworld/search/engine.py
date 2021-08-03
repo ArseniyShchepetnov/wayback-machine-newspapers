@@ -7,7 +7,7 @@ from whoosh.fields import ID, TEXT, Schema
 from whoosh.index import create_in
 from whoosh.qparser import QueryParser
 
-from status.search.items import JsonDocumentItem
+from paperworld.search.items import JsonDocumentItem
 
 
 class SearchEngineFileSystem:
@@ -42,6 +42,9 @@ class SearchEngineFileSystem:
         pat = self._construct_pattern(self._path)
 
         for doc in glob.glob(pat, recursive=True):
+
+            if os.path.split(doc)[1] == 'inputs.json':
+                continue
 
             item = JsonDocumentItem.from_file(doc)
 
