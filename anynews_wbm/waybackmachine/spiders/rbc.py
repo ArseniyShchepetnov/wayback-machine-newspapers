@@ -1,15 +1,12 @@
 """Scraper for rbc.ru site from waybackmachine."""
-import json
 import logging
-import os
 from typing import Optional
-from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup, NavigableString
 
-from paperworld.waybackmachine.items import WaybackMachineGeneralArticleItem
-from paperworld.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
-                                                    WaybackMachineResponseCDX)
+from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
+from anynews_wbm.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
+                                                     WaybackMachineResponseCDX)
 
 logger = logging.getLogger(__file__)
 
@@ -41,8 +38,6 @@ class SpiderRBC(SpiderWaybackMachineBase):
                         "Text length is %d",
                         title, title_date, len(text))
 
-            outpath = self.path_from_url(response.url)
-
             url_pars = WaybackMachineResponseCDX.from_archive_url(response.url)
 
             item = WaybackMachineGeneralArticleItem(
@@ -53,10 +48,8 @@ class SpiderRBC(SpiderWaybackMachineBase):
                 url=response.url,
                 timestamp=url_pars['timestamp'],
                 original=url_pars['original'],
-                path=outpath
+                snapshot=response.text
             )
-
-            self.save_snapshot(response.text, outpath)
 
         else:
 
@@ -64,28 +57,6 @@ class SpiderRBC(SpiderWaybackMachineBase):
             item = None
 
         return item
-
-    def path_from_url(self, url: str):
-
-        subdir = url2path(url)
-        outpath = os.path.join(self.scraper_outdir, subdir)
-
-        if not os.path.exists(outpath):
-            os.makedirs(outpath)
-
-        return outpath
-
-    def save_meta(self, data,  outpath: str):
-
-        outpath = os.path.join(outpath, 'meta.json')
-        with open(outpath, 'w', encoding='utf-8') as fobj:
-            json.dump(data, fobj, ensure_ascii=False, indent=4)
-
-    def save_snapshot(self, snapshot: str, outpath: str):
-
-        outpath = os.path.join(outpath, 'snapshot.html')
-        with open(outpath, 'w', encoding='utf-8') as fobj:
-            fobj.write(snapshot)
 
 
 def find_text(soup: BeautifulSoup) -> Optional[str]:
@@ -115,21 +86,6 @@ def find_text(soup: BeautifulSoup) -> Optional[str]:
         text = None
 
     return text
-
-
-def url2path(url: str) -> str:
-
-    url_path = urlparse(url).path
-
-    exclude = ['http:', 'https:']
-    url_list = url_path.split('/')
-    url_list = list(filter(lambda s: len(s) > 0 and s not in exclude,
-                           url_list))
-
-    url_list = url_list[1:]
-    path = os.path.join(*url_list)
-
-    return path
 
 
 def normalize_string(string: str) -> str:
