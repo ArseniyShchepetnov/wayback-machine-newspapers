@@ -1,8 +1,8 @@
 cdx:
   url: www.rbc.ru
   from_dt: "2019-01-01 00:00:00"
-  limit: 1000
-  matchType: "prefix"
+  limits: 100000
+  match_type: "prefix"
 filter:
   include_url:
   # - https://www.rbc.ru/politics
