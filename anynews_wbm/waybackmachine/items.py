@@ -7,6 +7,7 @@ import scrapy
 
 
 class WaybackMachineGeneralArticleItem(scrapy.Item):
+    """Parsed item from article."""
 
     text = scrapy.Field()
     title = scrapy.Field()
@@ -16,3 +17,4 @@ class WaybackMachineGeneralArticleItem(scrapy.Item):
     path = scrapy.Field()
     timestamp = scrapy.Field()
     original = scrapy.Field()
+    snapshot = scrapy.Field()

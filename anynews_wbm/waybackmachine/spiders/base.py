@@ -2,18 +2,16 @@
 import abc
 import json
 import logging
-import os
-import shutil
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import re
 import pandas as pd
 import parse
 import scrapy
 import yaml
-from paperworld.cdx import WaybackMachineCDX
-from paperworld.waybackmachine import settings
+from waybackmachine_cdx import WaybackMachineCDX
+from anynews_wbm.waybackmachine import settings
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +87,6 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
 
         scraper_settings = self.read_setting_file(settings_file)
 
-        self._init_output_dir(scraper_settings)
-
         cdx_settings = scraper_settings['cdx']
         for dt in ['from_dt', 'to_dt']:
             if dt in cdx_settings.keys():
@@ -101,31 +97,11 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
 
         self._filter = DefaultFilter(**scraper_settings['filter'])
 
-    @property
-    def scraper_outdir(self) -> str:
-        return os.path.join(self.output_directory, self.name)
-
-    def _init_output_dir(self, scraper_settings: Dict[str, Any]):
-        if os.path.exists(self.scraper_outdir):
-            dir2remove = os.path.join(self.output_directory,
-                                      self.scraper_outdir)
-            shutil.rmtree(dir2remove)
-
-        os.makedirs(self.scraper_outdir)
-
-        filename = os.path.join(self.scraper_outdir, 'inputs.json')
-        with open(filename, "w") as fobj:
-            json.dump(scraper_settings, fobj, indent=4)
-
-        filename = os.path.join(self.scraper_outdir, 'name')
-        with open(filename, "w") as fobj:
-            fobj.write(self.name)
-
     def read_setting_file(self, file: str) -> Dict:
         """Read YAML file with settings and return dict."""
 
         logger.info("read config file for spider '%s': '%s'", self.name, file)
-        with open(file, 'r') as stream:
+        with open(file, 'r', encoding='utf-8') as stream:
             data = yaml.safe_load(stream)
 
         return data
