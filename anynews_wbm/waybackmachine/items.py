@@ -13,6 +13,7 @@ class WaybackMachineGeneralArticleItem(scrapy.Item):
     title = scrapy.Field()
     publish_date = scrapy.Field()
     title_date = scrapy.Field()
+    url_date = scrapy.Field()
     url = scrapy.Field()
     path = scrapy.Field()
     timestamp = scrapy.Field()

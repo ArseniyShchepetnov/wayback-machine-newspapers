@@ -1,7 +1,7 @@
 cdx:
   url: www.rbc.ru
   from_dt: "2019-01-01 00:00:00"
-  limits: 100000
+  limits: 1000
   match_type: "prefix"
 filter:
   include_url:
@@ -11,7 +11,15 @@ filter:
   # - https://www.rbc.ru/rbcfreenews
   # - https://www.rbc.ru/finances
   exclude_url:
+    - https://web.archive.org/web/20210615030303/https://www.rbc.ru/info/
+    - https://www.rbc.ru/awards/blocks/topline/notifications.html
+    - https://www.rbc.ru/awards/blocks/preloader/main.html
+    - https://www.rbc.ru/info-service/api/v2/ev/
+    - (?:https://|http://){0,1}(?:www.){0,1}rbc.ru(?:\:80){0,1}/?video_id=.+$
     - (?:https://|http://){0,1}(?:www.){0,1}rbc.ru(?:\:80){0,1}/{0,1}\s*$
     - (?:https://|http://){0,1}(?:www.){0,1}rbc.ru(?:\:80){0,1}/(?:ajax|advert).*
+    - (?:https://|http://){0,1}(?:www.){0,1}rbc.ru(?:\:80){0,1}/tags/.*$
   exclude_statuscodes: ["404"]
   include_mimetypes: ["text/html"]
+
+filter_original: true

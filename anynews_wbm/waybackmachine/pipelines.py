@@ -14,6 +14,10 @@ import pymongo
 import scrapy
 from itemadapter import ItemAdapter
 
+from anynews_wbm.snapshot.db.client import DbClient, SnapshotCollectionClient
+from anynews_wbm.snapshot.snapshot import Snapshot
+from anynews_wbm.waybackmachine.spiders.base import SpiderWaybackMachineBase
+
 logger = logging.getLogger(__name__)
 
 
@@ -132,14 +136,30 @@ class MongodbWriterPipeline:
         self.client = None
         self.db = None
 
-    def open_spider(self, spider: scrapy.Spider):
+    def open_spider(self, spider: SpiderWaybackMachineBase):
 
-        self.client = pymongo.MongoClient(self.CONNECTION)
-        self.db = self.client[self.DATABASE]
+        self.client = DbClient(connection=self.CONNECTION,
+                               database=self.DATABASE)
 
-    def close_spider(self, spider):
-        self.client.close()
+        if spider.clear_database is True:
+            self.client.db.drop_collection(spider.name)
+            logger.info("Collection '%s' was dropped %s",
+                        spider.name, spider.clear_database)
+
+    def close_spider(self, spider: scrapy.Spider):
+        self.client.client.close()
+        logger.info("Connection for spider '%s' was closed", spider.name)
 
     def process_item(self, item: Any, spider: scrapy.Spider):
 
-        self.db[spider.name].insert_one(ItemAdapter(item).asdict())
+        snapshot_db = SnapshotCollectionClient(self.client, spider.name)
+
+        adapter_dict = ItemAdapter(item).asdict()
+        data = {
+            key: val
+            for key, val in adapter_dict.items()
+            if key != 'snapshot'
+        }
+
+        snapshot = Snapshot.from_dict(data, snapshot=adapter_dict['snapshot'])
+        snapshot_db.insert(snapshot, unique=True)
