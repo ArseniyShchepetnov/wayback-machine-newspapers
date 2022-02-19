@@ -1,17 +1,31 @@
 cdx:
-  url: https://meduza.io/galleries/2015/11/17/ot-sveta-k-tme
+  url: https://meduza.io/
   from_dt: "2019-01-01 00:00:00"
-  limit: 10000
-  matchType: "prefix"
+  limits: 10000
+  match_type: "prefix"
 filter:
   include_url:
-  # - https://www.rbc.ru/politics
-  # - https://www.rbc.ru/gorod
-  # - https://www.rbc.ru/economics
-  # - https://www.rbc.ru/rbcfreenews
-  # - https://www.rbc.ru/finances
   exclude_url:
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/robots.txt$
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/static/.*$
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/{0,1}\s*$
-    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/games\s*$
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/games.*$
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/{1,2}en/{0,1}.*$
+    - .+://mailto:.+
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/specials/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/amp/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/episodes/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/podcasts/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/imgly/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/image/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/digests/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/bookmarks/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/embed/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/account
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/galleries/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/video/.*
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/(survey|stat|special)/.*
   exclude_statuscodes: ["404"]
   include_mimetypes: ["text/html"]
+
+filter_original: true

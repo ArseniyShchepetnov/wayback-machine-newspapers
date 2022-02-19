@@ -411,7 +411,8 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=logger
+good-names=logger,
+           db
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
