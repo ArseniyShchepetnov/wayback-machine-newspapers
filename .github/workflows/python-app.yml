@@ -24,7 +24,8 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
       - name: Update PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
+      - name: Configure poetry
+        run: poetry config virtualenvs.in-project true
       - name: Install dependencies
         run: |
           poetry install
