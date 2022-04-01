@@ -5,7 +5,7 @@ description = ""
 authors = ["Arseniy Shchepetnov <a.shchepetnov@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8.6"
+python = "^3.8"
 pylint = "^2.11.1"
 Scrapy = "^2.5.1"
 autopep8 = "^1.6.0"
@@ -18,7 +18,6 @@ PyYAML = "^6.0"
 requests = "^2.26.0"
 matplotlib = "^3.5.1"
 nltk = "^3.6.7"
-newspaper3k = "^0.2.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
@@ -26,7 +25,12 @@ pylint = "^2.11.1"
 autopep8 = "^1.6.0"
 mypy = "^0.910"
 jupyterlab = "^3.2.3"
+types-requests = "^2.27.16"
+types-PyYAML = "^6.0.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+

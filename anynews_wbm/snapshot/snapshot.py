@@ -4,7 +4,7 @@ import dataclasses
 
 
 @dataclasses.dataclass(frozen=True)
-class SnapshotData:
+class SnapshotData:  # pylint: disable=too-many-instance-attributes
     """Parsed item from article."""
 
     text: str
@@ -22,12 +22,26 @@ class SnapshotData:
         """Returns list of fields in the data."""
         return [field.name for field in dataclasses.fields(cls)]
 
+    @staticmethod
+    def key_fields() -> List[str]:
+        """Key fields to distinguish snapshots."""
+        fields = ['title', 'publish_date']
+        assert fields in dataclasses.asdict(SnapshotData).keys()
+        return fields
+
 
 class Snapshot:
     """Snapshot class."""
 
     def __init__(self, data: SnapshotData, snapshot: Optional[str] = None):
-
+        """
+        Parameters
+        ----------
+        data : SnapshotData
+            _description_
+        snapshot : Optional[str], optional
+            _description_, by default None
+        """
         self._data = data
         self._snapshot = snapshot
 
@@ -47,20 +61,20 @@ class Snapshot:
     @staticmethod
     def key_fields() -> List[str]:
         """Key fields to distinguish snapshots."""
-        return ['title', 'publish_date']
+        return SnapshotData.key_fields()
 
     def get_keys(self) -> Dict[str, str]:
+        """Key fields data."""
         result = {}
         for key in self.key_fields():
             result[key] = getattr(self.data, key)
         return result
 
     def snapshot_dict(self):
-
+        """Convert to dictionary."""
         data = {'origin': self._snapshot}
         keys = {key: getattr(self.data, key) for key in self.key_fields()}
         data = {**data, **keys}
-
         return data
 
     def data_dict(self) -> Dict[str, str]:

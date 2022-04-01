@@ -1,11 +1,10 @@
 """Wayback Machine CDX spider."""
 import abc
-from dataclasses import dataclass
 import json
 import logging
 import re
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Pattern, Any
+from typing import Dict, List, Optional, Tuple, Pattern, Any, Callable
 
 import pandas as pd
 import parse
@@ -66,7 +65,8 @@ class WaybackMachineResponseCDX:
         """Number of rows in the response."""
         return len(self.data.index)
 
-    def filter(self, condition) -> 'WaybackMachineResponseCDX':
+    def filter(self, condition: Callable) -> 'WaybackMachineResponseCDX':
+        """Filter by condition."""
         where = self.data.apply(condition, axis=1)
         data_new = self.data[where]
         return WaybackMachineResponseCDX(data_new, resume_key=self.resume_key)

@@ -26,14 +26,11 @@ class WaybackResponse:
         """Data from json response."""
 
         json_data = json.loads(response.content.decode("utf-8"))
-
         columns = json_data[0]
 
         if len(json_data[-1] == 1) and len(json_data[-2] == 0):
-
             resume_key = json_data[-1][0]
             data = pd.DataFrame(json_data[1:-2], columns=columns)
-
         else:
             resume_key = None
             data = pd.DataFrame(json_data[1:], columns=columns)

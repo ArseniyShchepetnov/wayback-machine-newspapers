@@ -1,12 +1,14 @@
+"""
+Scrapy settings for waybackmachine project
+
+For simplicity, this file contains only settings considered important or
+commonly used. You can find more settings consulting the documentation:
+
+https://docs.scrapy.org/en/latest/topics/settings.html
+https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+"""
 import os
-# Scrapy settings for waybackmachine project
-#
-# For simplicity, this file contains only settings considered important or
-# commonly used. You can find more settings consulting the documentation:
-#
-#     https://docs.scrapy.org/en/latest/topics/settings.html
-#     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'waybackmachine'
 
@@ -14,7 +16,8 @@ SPIDER_MODULES = ['waybackmachine.spiders']
 NEWSPIDER_MODULE = 'waybackmachine.spiders'
 
 
-# Crawl responsibly by identifying yourself (and your website) on the user-agent
+# Crawl responsibly by identifying yourself
+# (and your website) on the user-agent
 #USER_AGENT = 'waybackmachine (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
@@ -39,7 +42,8 @@ DOWNLOAD_DELAY = 0.3
 
 # Override the default request headers:
 # DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+#   'Accept':
+# 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
 # }
 
@@ -82,7 +86,9 @@ ITEM_PIPELINES = {
 #AUTOTHROTTLE_DEBUG = False
 
 # Enable and configure HTTP caching (disabled by default)
-# See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
+# See
+# https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+# #httpcache-middleware-settings
 #HTTPCACHE_ENABLED = True
 #HTTPCACHE_EXPIRATION_SECS = 0
 #HTTPCACHE_DIR = 'httpcache'

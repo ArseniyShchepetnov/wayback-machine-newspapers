@@ -1,6 +1,6 @@
 """Client for database with snapshot."""
 import logging
-from typing import List, Optional
+from typing import List, Optional, Iterator
 
 import pymongo
 from anynews_wbm.snapshot.snapshot import Snapshot
@@ -17,6 +17,14 @@ class DbClient:
     def __init__(self,
                  connection: Optional[str] = None,
                  database: Optional[str] = None):
+        """
+        Parameters
+        ----------
+        connection : Optional[str], optional
+            MongoDB connection string, by default None.
+        database : Optional[str], optional
+            Database name, by default None.
+        """
 
         if connection is None:
             connection = self.CONNECTION
@@ -49,6 +57,14 @@ class SnapshotCollectionClient:
     _special_fields = ['_id']
 
     def __init__(self, db: DbClient, name: str):
+        """
+        Parameters
+        ----------
+        db : DbClient
+            Database client object.
+        name : str
+            Name of the collection with articles.
+        """
         self._db = db
         self._name = name
 
@@ -72,9 +88,11 @@ class SnapshotCollectionClient:
 
     @property
     def collection(self) -> pymongo.collection.Collection:
+        """Get `pymongo` collection object."""
         return self._collection
 
     def document2snapshot(self, doc) -> Snapshot:
+        """Convert document to `Snapshot` object."""
         item = {
             key: val for key, val in doc.items()
             if key not in self._special_fields
@@ -83,7 +101,7 @@ class SnapshotCollectionClient:
         return snapshot
 
     def cursor2snapshots(self, cursor) -> List[Snapshot]:
-
+        """Convert cursor to the list of snapshots."""
         result = []
         for item in cursor:
             snapshot = self.document2snapshot(item)
@@ -92,7 +110,7 @@ class SnapshotCollectionClient:
         return result
 
     def find_keys(self, **kwargs) -> pymongo.cursor.Cursor:
-
+        """Find snapshots """
         key_fields = Snapshot.key_fields()
         keys = set(kwargs) - set(key_fields)
 
@@ -103,38 +121,83 @@ class SnapshotCollectionClient:
 
         return result
 
-    def find_datetime_cursor(self, query: str) -> pymongo.cursor.Cursor:
-        cursor = self._collection.find({"title": {"$regex": query}})
+    def find_field(self, field: str, regex: str) -> pymongo.cursor.Cursor:
+        """
+        Call mongodb find method in the collection
+        and match by regular expression.
+
+        Parameters
+        ----------
+        field : str
+            Field name.
+        regex : str
+            Mongodb find regular expression.
+
+        Returns
+        -------
+        pymongo.cursor.Cursor
+            Cursor with found documents.
+        """
+        cursor = self._collection.find({field: {"$regex": regex}})
         return cursor
 
-    def find_title_cursor(self, query: str) -> pymongo.cursor.Cursor:
-        cursor = self._collection.find({"title": {"$regex": query}})
-        return cursor
+    def find_field_snapshot(self,
+                            field: str,
+                            regex: str) -> Iterator[Snapshot]:
+        """
+        Call mongodb find method in the collection
+        and match by regular expression.
+
+
+        Parameters
+        ----------
+        field : str
+            Field name.
+        regex : str
+            Mongodb find regular expression.
+
+        Yields
+        ------
+        Iterator[Snapshot]
+            Iterator with snapshots.
+        """
+        cursor = self.find_field(field, regex)
+        for doc in cursor:
+            yield self.document2snapshot(doc)
 
     def all_titles(self):
+        """Iterate over titles."""
         for doc in self._collection.find({}):
             yield doc["title"]
 
-    def all_documents(self):
+    def all_documents(self) -> pymongo.cursor.Cursor:
+        """Returns cursor over all documents."""
         return self._collection.find({})
 
     def iterate_snapshots(self, query):
+        """Iterate over snapshots using collection `find` method."""
         for doc in self._collection.find(query):
             yield self.document2snapshot(doc)
 
-    def find_title(self, query: str) -> List[Snapshot]:
-
-        cursor = self.find_title_cursor(query)
-        result = self.cursor2snapshots(cursor)
-
-        return result
-
     def find_similar_cursor(self, snapshot: Snapshot) -> pymongo.cursor.Cursor:
+        """Find similar snapshots using snapshots key fields."""
         dict_keys = snapshot.get_keys()
         result = self.find_keys(**dict_keys)
         return result
 
     def insert(self, snapshot: Snapshot, unique: bool = True):
+        """
+        Insert snapshot to the collection.
+
+        Parameters
+        ----------
+        snapshot : Snapshot
+            Snapshot object.
+        unique : bool, optional
+            Check snapshot keys existing in the collection.
+            If exists then new snapshot won't be inserted. 
+            By default True.
+        """
 
         has_similar = False
         if unique:
@@ -152,6 +215,7 @@ class SnapshotCollectionClient:
             logger.debug("Write to database")
 
     def find_original_url(self, url: str) -> List[Snapshot]:
+        """Find original URL match."""
         cursor = self._collection.find({"original": url})
         result = self.cursor2snapshots(cursor)
         return result
