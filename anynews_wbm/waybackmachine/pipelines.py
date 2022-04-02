@@ -1,8 +1,10 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# useful for handling different item types with a single interface
+"""
+Define your item pipelines here
+
+Don't forget to add your pipeline to the ITEM_PIPELINES setting
+See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+useful for handling different item types with a single interface
+"""
 import json
 import logging
 import os
@@ -115,7 +117,7 @@ class JsonWriterPipeline:
 
         return item
 
-    def save_snapshot(self, snapshot: str, outpath: str):
+    def save_snapshot(self, snapshot: str, outpath: str):  # pylint: disable=no-self-use
         """Save snapshot to the output path."""
         outpath = os.path.join(outpath, 'snapshot.html')
         with open(outpath, 'w', encoding='utf-8') as fobj:

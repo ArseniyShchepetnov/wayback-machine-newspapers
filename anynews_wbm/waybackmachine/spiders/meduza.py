@@ -27,6 +27,8 @@ logger.addHandler(logger_handler)
 
 
 class SpiderMeduza(SpiderWaybackMachineBase):
+    """Spider for meduza.io scraping from WaybackMachine."""
+
     CONNECTION = 'mongodb://localhost'
     DATABASE = 'anynews_wbm'
     name = "spider_meduza"
@@ -121,7 +123,7 @@ class SpiderMeduza(SpiderWaybackMachineBase):
 
 
 def url2path(url: str) -> str:
-
+    """Convert URL string to path."""
     url_path = urlparse(url).path
 
     exclude = ['http:', 'https:']

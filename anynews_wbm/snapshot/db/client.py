@@ -195,7 +195,7 @@ class SnapshotCollectionClient:
             Snapshot object.
         unique : bool, optional
             Check snapshot keys existing in the collection.
-            If exists then new snapshot won't be inserted. 
+            If exists then new snapshot won't be inserted.
             By default True.
         """
 
