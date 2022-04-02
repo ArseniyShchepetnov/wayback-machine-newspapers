@@ -2,7 +2,10 @@
 import logging
 import re
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Optional
+
+from bs4 import BeautifulSoup
+from scrapy.utils.log import configure_logging
 
 from anynews_wbm.domains.rbc.extract import RbcExtractor
 from anynews_wbm.extaction.utils import path_stat
@@ -10,8 +13,6 @@ from anynews_wbm.snapshot.db.client import DbClient, SnapshotCollectionClient
 from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
 from anynews_wbm.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
                                                      WaybackMachineResponseCDX)
-from bs4 import BeautifulSoup, NavigableString
-from scrapy.utils.log import configure_logging
 
 configure_logging(install_root_handler=False)
 
@@ -117,35 +118,6 @@ class SpiderRBC(SpiderWaybackMachineBase):
 
         logger.debug("End processing.")
         return item
-
-
-def find_text(soup: BeautifulSoup) -> Optional[str]:
-
-    text_list = []
-    for tag in soup.find_all("div", {"class": "article__text"}):
-
-        if not isinstance(tag, NavigableString):
-
-            for string in soup.find_all("p"):
-                text = string.text
-                text_list.append(text)
-
-    counts: Dict[str, int] = {}
-    for string in text_list:
-        num = counts.get(string)
-        if num is None:
-            counts[string] = 0
-        else:
-            counts[string] += 1
-
-    text_list = [key for key, val in counts.items() if val == 1]
-
-    if len(text_list) > 0:
-        text = "\n".join(text_list)
-    else:
-        text = None
-
-    return text
 
 
 def get_url_date_iso(url: str) -> Optional[str]:

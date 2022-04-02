@@ -6,14 +6,15 @@ from datetime import datetime
 from typing import Optional
 from urllib.parse import urlparse
 
+from bs4 import BeautifulSoup
+from scrapy.utils.log import configure_logging
+
 from anynews_wbm.domains.meduza.extract import MeduzaExtractor
 from anynews_wbm.extaction.utils import path_stat
 from anynews_wbm.snapshot.db.client import DbClient, SnapshotCollectionClient
 from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
 from anynews_wbm.waybackmachine.spiders.base import (SpiderWaybackMachineBase,
                                                      WaybackMachineResponseCDX)
-from bs4 import BeautifulSoup
-from scrapy.utils.log import configure_logging
 
 configure_logging(install_root_handler=False)
 

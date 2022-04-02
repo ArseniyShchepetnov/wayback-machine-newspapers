@@ -4,14 +4,15 @@ import json
 import logging
 import re
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Pattern, Any, Callable
+from typing import Any, Callable, Dict, List, Optional, Pattern, Tuple
 
 import pandas as pd
 import parse
 import scrapy
 import yaml
-from anynews_wbm.waybackmachine import settings
 from waybackmachine_cdx import WaybackMachineCDX
+
+from anynews_wbm.waybackmachine import settings
 
 logger = logging.getLogger(__name__)
 
