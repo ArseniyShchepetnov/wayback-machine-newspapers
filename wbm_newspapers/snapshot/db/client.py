@@ -3,7 +3,7 @@ import logging
 from typing import List, Optional, Iterator
 
 import pymongo
-from anynews_wbm.snapshot.snapshot import Snapshot
+from wbm_newspapers.snapshot.snapshot import Snapshot
 
 logger = logging.getLogger(__file__)
 
