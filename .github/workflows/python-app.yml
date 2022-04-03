@@ -49,7 +49,7 @@ jobs:
 
       - name: Lint with pylint
         run: |
-          poetry run pylint anynews_wbm --fail-under=10
+          poetry run pylint wbm_newspapers --fail-under=10
 
       - name: Test with pytest
         run: |
