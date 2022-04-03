@@ -12,7 +12,8 @@ from waybackmachine_cdx import WaybackMachineCDX
 
 from wbm_newspapers.extaction.extraction import BaseExtractor
 from wbm_newspapers.waybackmachine import settings
-from wbm_newspapers.waybackmachine.items import WaybackMachineGeneralArticleItem
+from wbm_newspapers.waybackmachine.items import \
+    WaybackMachineGeneralArticleItem
 from wbm_newspapers.waybackmachine.spiders.db import SpiderDatabase
 from wbm_newspapers.waybackmachine.spiders.response import \
     WaybackMachineResponseCDX

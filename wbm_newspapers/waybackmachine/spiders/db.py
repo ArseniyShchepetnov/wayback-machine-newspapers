@@ -1,5 +1,6 @@
 """Database interface for spiders."""
-from wbm_newspapers.snapshot.db.client import DbClient, SnapshotCollectionClient
+from wbm_newspapers.snapshot.db.client import (DbClient,
+                                               SnapshotCollectionClient)
 from wbm_newspapers.waybackmachine.spiders.response import \
     WaybackMachineResponseCDX
 
