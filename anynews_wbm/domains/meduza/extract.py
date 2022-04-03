@@ -8,10 +8,11 @@ from anynews_wbm.extaction.extraction import BaseExtractor
 from anynews_wbm.extaction.utils import text_tags_class_pattern
 
 
-class MeduzaExtractor:
+class MeduzaExtractor(BaseExtractor):
     """Meduza extractor."""
 
     def __init__(self, soup: BeautifulSoup, url: str):
+        super().__init__(soup, url)
 
         self.extractor: BaseExtractor
 

@@ -10,9 +10,12 @@ import pandas as pd
 import parse
 import scrapy
 import yaml
+from bs4 import BeautifulSoup
 from waybackmachine_cdx import WaybackMachineCDX
 
+from anynews_wbm.extaction.extraction import BaseExtractor
 from anynews_wbm.waybackmachine import settings
+from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
 
 logger = logging.getLogger(__name__)
 
@@ -261,8 +264,70 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
             logger.info("No resume key was provided. Finalizing...")
 
     @abc.abstractmethod
-    def parse(self, response: scrapy.http.TextResponse):  # pylint: disable=arguments-differ
+    def get_extractor(self, soup: BeautifulSoup, url: str) -> BaseExtractor:
         """Parse snapshot"""
+
+    def parse(self, response, *args, **kwargs):  # pylint: disable=unused-argument
+        """Parse snapshot"""
+
+        self.counter['parse'] += 1
+
+        soup = BeautifulSoup(response.text)
+        url_pars = WaybackMachineResponseCDX.from_archive_url(response.url)
+        url_original = url_pars['original']
+
+        extractor = self.get_extractor(soup, url_original)
+
+        logger.debug("Processing... '%s'", url_original)
+
+        text = extractor.get_text()
+        title = extractor.get_title()
+
+        if len(text) > 0 and len(title) == 0:
+            logger.error("Title length is zero for url '%s'. Text length = %d",
+                         response.url, len(text))
+            self.counter['failed'] += 1
+            raise ValueError(
+                f"Title length is zero. Text length = {len(text)}")
+
+        if len(text) > 0:
+
+            url_datetime = extractor.get_datetime()
+            if url_datetime is not None:
+                url_date = url_datetime.isoformat()
+            else:
+                url_date = ''
+            title_date = extractor.get_header_datetime()
+
+            logger.debug("stat: text = %d, title = %d, "
+                         "title_date = %d, url_date = %d",
+                         len(text), len(title), len(title_date), len(url_date))
+
+            item = WaybackMachineGeneralArticleItem(
+                text=text,
+                title=title,
+                publish_date='',
+                title_date=title_date,
+                url_date=url_date,
+                url=response.url,
+                timestamp=url_pars['timestamp'],
+                original=url_original,
+                snapshot=response.text,
+                path="?"
+            )
+            self.counter['success'] += 1
+        else:
+            if title:
+                logger.warning(
+                    "Warning while retrieving title no text found. "
+                    "Title='%s' url='%s'",
+                    title, response.url)
+            logger.info("No text found: '%s'", response.url)
+            item = None
+            self.counter['failed'] += 1
+
+        logger.debug("End processing.")
+        return item
 
 
 class SnapshotUrlIterator:

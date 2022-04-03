@@ -8,6 +8,7 @@ from anynews_wbm.extaction.utils import text_tags_class_pattern
 
 
 class KommersantExtractor(BaseExtractor):
+    """Kommersant articles extractor."""
 
     def get_text(self) -> str:
         text = text_tags_class_pattern(self.soup,
