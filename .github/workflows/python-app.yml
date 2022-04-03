@@ -53,4 +53,5 @@ jobs:
 
       - name: Test with pytest
         run: |
+          sudo systemctl start mongod
           poetry run pytest
