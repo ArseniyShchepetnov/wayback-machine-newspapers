@@ -15,7 +15,8 @@ from urllib.parse import urlparse
 import scrapy
 from itemadapter import ItemAdapter
 
-from wbm_newspapers.snapshot.db.client import DbClient, SnapshotCollectionClient
+from wbm_newspapers.snapshot.db.client import (DbClient,
+                                               SnapshotCollectionClient)
 from wbm_newspapers.snapshot.snapshot import Snapshot
 from wbm_newspapers.waybackmachine.spiders.base import SpiderWaybackMachineBase
 
