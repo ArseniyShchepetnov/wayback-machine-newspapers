@@ -16,6 +16,7 @@ from waybackmachine_cdx import WaybackMachineCDX
 from anynews_wbm.extaction.extraction import BaseExtractor
 from anynews_wbm.waybackmachine import settings
 from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
+from anynews_wbm.waybackmachine.spiders.db import SpiderDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -154,6 +155,9 @@ class DefaultFilter:
 class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
     """Basic Wayback Machine domain scraper."""
 
+    DB_HOST = 'mongodb://localhost'
+    DB_NAME = 'anynews_wbm'
+
     counter = {'parse': 0, 'success': 0, 'failed': 0}
 
     def __init__(self,
@@ -180,6 +184,14 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
         self.clear_database: bool = clear.lower() in ['true', 't', 'y', 'yes']
         logger.info("Collection will be dropped: %s", clear)
         self._special_settings = scraper_settings
+
+        filter_original = self.special_settings().get('filter_original')
+        if filter_original is not None and filter_original:
+            db_settings = self.special_settings().get('db', {})
+            self._db = SpiderDatabase(
+                self.name,
+                db_settings.get('host', self.DB_HOST),
+                db_settings.get('database', self.DB_NAME))
 
     def special_settings(self) -> Dict[str, Any]:
         """Special spider settings from file."""
@@ -227,9 +239,14 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
 
         return data
 
-    def filter(self,  # pylint: disable=no-self-use
+    def filter(self,
                data: WaybackMachineResponseCDX) -> WaybackMachineResponseCDX:
-        """Reimplement this for custom filtration."""
+        """Filter urls."""
+        if self._db is not None:
+            n_rows_before = data.n_rows
+            self._db.filter(data)
+            logger.info("Spider '%s' filtered %d rows by original URL %d left",
+                        self.name, n_rows_before - data.n_rows, data.n_rows)
         return data
 
     def parse_cdx(self, response: scrapy.http.TextResponse):
