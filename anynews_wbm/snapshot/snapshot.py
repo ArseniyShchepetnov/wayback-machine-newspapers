@@ -26,7 +26,6 @@ class SnapshotData:  # pylint: disable=too-many-instance-attributes
     def key_fields() -> List[str]:
         """Key fields to distinguish snapshots."""
         fields = ['title', 'publish_date']
-        assert fields in dataclasses.asdict(SnapshotData).keys()
         return fields
 
 

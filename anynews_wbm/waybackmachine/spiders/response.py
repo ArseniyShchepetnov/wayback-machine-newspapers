@@ -19,8 +19,8 @@ class WaybackMachineResponseCDX:
     @classmethod
     def from_list(cls, data: List[List[str]]) -> 'WaybackMachineResponseCDX':
         """Instantiate class form list of lists data."""
-
         resume_key: Optional[str] = None
+
         if len(data[-2]) == 0:
             resume_key = data[-1][0]
             data = pd.DataFrame(data[1:-2], columns=data[0])

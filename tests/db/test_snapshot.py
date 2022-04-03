@@ -1,3 +1,4 @@
+"""Test snapshots and database."""
 from typing import List
 
 import pytest
