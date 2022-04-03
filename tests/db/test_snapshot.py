@@ -2,8 +2,8 @@
 from typing import List
 
 import pytest
-from anynews_wbm.snapshot.db.client import DbClient, SnapshotCollectionClient
-from anynews_wbm.snapshot.snapshot import Snapshot, SnapshotData
+from wbm_newspapers.snapshot.db.client import DbClient, SnapshotCollectionClient
+from wbm_newspapers.snapshot.snapshot import Snapshot, SnapshotData
 
 
 @pytest.fixture(autouse=True)

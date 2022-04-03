@@ -10,11 +10,12 @@ import yaml
 from bs4 import BeautifulSoup
 from waybackmachine_cdx import WaybackMachineCDX
 
-from anynews_wbm.extaction.extraction import BaseExtractor
-from anynews_wbm.waybackmachine import settings
-from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
-from anynews_wbm.waybackmachine.spiders.db import SpiderDatabase
-from anynews_wbm.waybackmachine.spiders.response import \
+from wbm_newspapers.extaction.extraction import BaseExtractor
+from wbm_newspapers.waybackmachine import settings
+from wbm_newspapers.waybackmachine.items import \
+    WaybackMachineGeneralArticleItem
+from wbm_newspapers.waybackmachine.spiders.db import SpiderDatabase
+from wbm_newspapers.waybackmachine.spiders.response import \
     WaybackMachineResponseCDX
 
 logger = logging.getLogger(__name__)
