@@ -5,7 +5,7 @@ description = ""
 authors = ["Arseniy Shchepetnov <a.shchepetnov@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8.6,<4.0"
 pylint = "^2.11.1"
 Scrapy = "^2.5.1"
 autopep8 = "^1.6.0"

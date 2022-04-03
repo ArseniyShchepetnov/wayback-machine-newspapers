@@ -15,9 +15,9 @@ from urllib.parse import urlparse
 import scrapy
 from itemadapter import ItemAdapter
 
-from anynews_wbm.snapshot.db.client import DbClient, SnapshotCollectionClient
-from anynews_wbm.snapshot.snapshot import Snapshot
-from anynews_wbm.waybackmachine.spiders.base import SpiderWaybackMachineBase
+from wbm_newspapers.snapshot.db.client import DbClient, SnapshotCollectionClient
+from wbm_newspapers.snapshot.snapshot import Snapshot
+from wbm_newspapers.waybackmachine.spiders.base import SpiderWaybackMachineBase
 
 logger = logging.getLogger(__name__)
 

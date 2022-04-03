@@ -3,11 +3,11 @@ import re
 from datetime import datetime
 from typing import List, Optional
 
-from anynews_wbm.extaction.extraction import BaseExtractor
-from anynews_wbm.extaction.transforms import (BaseSnapshotTransfrom,
-                                              RemoveTagsByName,
-                                              SnapshotTransformPipeline)
-from anynews_wbm.extaction.utils import text_tags_class_pattern
+from wbm_newspapers.extaction.extraction import BaseExtractor
+from wbm_newspapers.extaction.transforms import (BaseSnapshotTransfrom,
+                                                 RemoveTagsByName,
+                                                 SnapshotTransformPipeline)
+from wbm_newspapers.extaction.utils import text_tags_class_pattern
 
 
 class RbcExtractor(BaseExtractor):
