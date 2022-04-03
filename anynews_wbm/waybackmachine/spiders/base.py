@@ -1,90 +1,23 @@
 """Wayback Machine CDX spider."""
 import abc
-from dataclasses import dataclass
-import json
 import logging
 import re
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Pattern, Any
+from typing import Any, Dict, List, Optional, Pattern
 
-import pandas as pd
-import parse
 import scrapy
 import yaml
-from anynews_wbm.waybackmachine import settings
+from bs4 import BeautifulSoup
 from waybackmachine_cdx import WaybackMachineCDX
 
+from anynews_wbm.extaction.extraction import BaseExtractor
+from anynews_wbm.waybackmachine import settings
+from anynews_wbm.waybackmachine.items import WaybackMachineGeneralArticleItem
+from anynews_wbm.waybackmachine.spiders.db import SpiderDatabase
+from anynews_wbm.waybackmachine.spiders.response import \
+    WaybackMachineResponseCDX
+
 logger = logging.getLogger(__name__)
-
-
-class WaybackMachineResponseCDX:
-    """CDX response data."""
-
-    url_template = 'https://web.archive.org/web/{timestamp}/{original}'
-
-    def __init__(self, data: pd.DataFrame, resume_key: Optional[str] = None):
-        """Parse response"""
-        self._resume_key = resume_key
-        self._data = data
-
-    @classmethod
-    def from_list(cls, data: List[List[str]]) -> 'WaybackMachineResponseCDX':
-        """Instantiate class form list of lists data."""
-
-        resume_key: Optional[str] = None
-        if len(data[-2]) == 0:
-            resume_key = data[-1][0]
-            data = pd.DataFrame(data[1:-2], columns=data[0])
-        else:
-            data = pd.DataFrame(data[1:], columns=data[0])
-
-        return cls(data, resume_key)
-
-    @classmethod
-    def from_text(cls, text) -> 'WaybackMachineResponseCDX':
-        """From text json response."""
-        json_data = json.loads(text)
-        return cls.from_list(json_data)
-
-    @property
-    def resume_key(self) -> Optional[str]:
-        """Resume key parsed from response."""
-        return self._resume_key
-
-    @property
-    def data(self) -> pd.DataFrame:
-        """data."""
-        return self._data
-
-    @property
-    def columns(self) -> List[str]:
-        """Column names."""
-        return self._data.columns
-
-    @property
-    def n_rows(self):
-        """Number of rows in the response."""
-        return len(self.data.index)
-
-    def filter(self, condition) -> 'WaybackMachineResponseCDX':
-        where = self.data.apply(condition, axis=1)
-        data_new = self.data[where]
-        return WaybackMachineResponseCDX(data_new, resume_key=self.resume_key)
-
-    @classmethod
-    def snapshot_to_archive_url(cls, snapshot: Dict[str, str]) -> str:
-        """Get archive url."""
-        return cls.url_template.format(**snapshot)
-
-    @classmethod
-    def to_archive_url(cls, original: str, timestamp: str) -> str:
-        """Get archive url."""
-        return cls.url_template.format(original=original, timestamp=timestamp)
-
-    @classmethod
-    def from_archive_url(cls, archive_url: str) -> Tuple[str, str]:
-        """Get archive url."""
-        return parse.parse(cls.url_template, archive_url)
 
 
 class DefaultFilter:
@@ -150,6 +83,9 @@ class DefaultFilter:
 class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
     """Basic Wayback Machine domain scraper."""
 
+    DB_HOST = 'mongodb://localhost'
+    DB_NAME = 'anynews_wbm'
+
     counter = {'parse': 0, 'success': 0, 'failed': 0}
 
     def __init__(self,
@@ -176,6 +112,14 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
         self.clear_database: bool = clear.lower() in ['true', 't', 'y', 'yes']
         logger.info("Collection will be dropped: %s", clear)
         self._special_settings = scraper_settings
+
+        filter_original = self.special_settings().get('filter_original')
+        if filter_original is not None and filter_original:
+            db_settings = self.special_settings().get('db', {})
+            self._db = SpiderDatabase(
+                self.name,
+                db_settings.get('host', self.DB_HOST),
+                db_settings.get('database', self.DB_NAME))
 
     def special_settings(self) -> Dict[str, Any]:
         """Special spider settings from file."""
@@ -223,9 +167,14 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
 
         return data
 
-    def filter(self,  # pylint: disable=no-self-use
+    def filter(self,
                data: WaybackMachineResponseCDX) -> WaybackMachineResponseCDX:
-        """Reimplement this for custom filtration."""
+        """Filter urls."""
+        if self._db is not None:
+            n_rows_before = data.n_rows
+            self._db.filter(data)
+            logger.info("Spider '%s' filtered %d rows by original URL %d left",
+                        self.name, n_rows_before - data.n_rows, data.n_rows)
         return data
 
     def parse_cdx(self, response: scrapy.http.TextResponse):
@@ -260,8 +209,70 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
             logger.info("No resume key was provided. Finalizing...")
 
     @abc.abstractmethod
-    def parse(self, response: scrapy.http.TextResponse):  # pylint: disable=arguments-differ
+    def get_extractor(self, soup: BeautifulSoup, url: str) -> BaseExtractor:
         """Parse snapshot"""
+
+    def parse(self, response, *args, **kwargs):  # pylint: disable=unused-argument
+        """Parse snapshot"""
+
+        self.counter['parse'] += 1
+
+        soup = BeautifulSoup(response.text)
+        url_pars = WaybackMachineResponseCDX.from_archive_url(response.url)
+        url_original = url_pars['original']
+
+        extractor = self.get_extractor(soup, url_original)
+
+        logger.debug("Processing... '%s'", url_original)
+
+        text = extractor.get_text()
+        title = extractor.get_title()
+
+        if len(text) > 0 and len(title) == 0:
+            logger.error("Title length is zero for url '%s'. Text length = %d",
+                         response.url, len(text))
+            self.counter['failed'] += 1
+            raise ValueError(
+                f"Title length is zero. Text length = {len(text)}")
+
+        if len(text) > 0:
+
+            url_datetime = extractor.get_datetime()
+            if url_datetime is not None:
+                url_date = url_datetime.isoformat()
+            else:
+                url_date = ''
+            title_date = extractor.get_header_datetime()
+
+            logger.debug("stat: text = %d, title = %d, "
+                         "title_date = %d, url_date = %d",
+                         len(text), len(title), len(title_date), len(url_date))
+
+            item = WaybackMachineGeneralArticleItem(
+                text=text,
+                title=title,
+                publish_date='',
+                title_date=title_date,
+                url_date=url_date,
+                url=response.url,
+                timestamp=url_pars['timestamp'],
+                original=url_original,
+                snapshot=response.text,
+                path="?"
+            )
+            self.counter['success'] += 1
+        else:
+            if title:
+                logger.warning(
+                    "Warning while retrieving title no text found. "
+                    "Title='%s' url='%s'",
+                    title, response.url)
+            logger.info("No text found: '%s'", response.url)
+            item = None
+            self.counter['failed'] += 1
+
+        logger.debug("End processing.")
+        return item
 
 
 class SnapshotUrlIterator:

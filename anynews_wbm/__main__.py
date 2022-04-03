@@ -6,12 +6,13 @@ from scrapy.settings import Settings
 
 
 def main():
+    """Main function."""
 
     args = parse_args()
 
-    config = {
-        'domains': args.domains,
-    }
+    # config = {
+    #     'domains': args.domains,
+    # }
 
     settings = Settings({
         # 'USER_AGENT': (
@@ -35,6 +36,7 @@ def main():
 
 
 def parse_args():
+    """Argument parsing."""
 
     formatter = argparse.ArgumentDefaultsHelpFormatter
     parser = argparse.ArgumentParser(formatter_class=formatter, description=(

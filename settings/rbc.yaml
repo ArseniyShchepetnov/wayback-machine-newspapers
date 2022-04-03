@@ -11,7 +11,8 @@ filter:
   # - https://www.rbc.ru/rbcfreenews
   # - https://www.rbc.ru/finances
   exclude_url:
-    - https://web.archive.org/web/20210615030303/https://www.rbc.ru/info/
+    - https://www.rbc.ru/contacts/
+    - https://www.rbc.ru/info/
     - https://www.rbc.ru/awards/blocks/topline/notifications.html
     - https://www.rbc.ru/awards/blocks/preloader/main.html
     - https://www.rbc.ru/info-service/api/v2/ev/

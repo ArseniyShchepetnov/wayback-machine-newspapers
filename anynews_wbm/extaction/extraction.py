@@ -3,12 +3,13 @@ import abc
 import datetime
 from typing import List, Optional
 
+from bs4 import BeautifulSoup
+
 from anynews_wbm.extaction.transforms import (BaseSnapshotTransfrom,
                                               RemoveSpanNotDropcap,
                                               RemoveTagsByName,
                                               SnapshotTransformPipeline)
 from anynews_wbm.extaction.utils import normalize_string
-from bs4 import BeautifulSoup
 
 
 class BaseExtractor(metaclass=abc.ABCMeta):

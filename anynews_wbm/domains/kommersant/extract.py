@@ -4,32 +4,22 @@ from datetime import datetime
 from typing import List, Optional
 
 from anynews_wbm.extaction.extraction import BaseExtractor
-from anynews_wbm.extaction.transforms import (BaseSnapshotTransfrom,
-                                              RemoveTagsByName,
-                                              SnapshotTransformPipeline)
 from anynews_wbm.extaction.utils import text_tags_class_pattern
 
 
-class RbcExtractor(BaseExtractor):
-    """Extractor from rbc.ru newspaper."""
-
-    @staticmethod
-    def preprocess_pipeline() -> BaseSnapshotTransfrom:
-        """Returns default preprocess pipeline."""
-        return SnapshotTransformPipeline([
-            RemoveTagsByName(['script', 'img', 'svg', 'style', 'button'])
-        ])
+class KommersantExtractor(BaseExtractor):
+    """Kommersant articles extractor."""
 
     def get_text(self) -> str:
         text = text_tags_class_pattern(self.soup,
-                                       "article__text.*",
-                                       "div")
+                                       "doc__text",
+                                       "p")
         return text
 
     def get_title(self) -> str:
         return text_tags_class_pattern(self.soup,
-                                       "article__header__title",
-                                       "div")
+                                       "doc_header__name",
+                                       "h1")
 
     def get_authors(self) -> List[str]:
         return []
@@ -39,8 +29,8 @@ class RbcExtractor(BaseExtractor):
 
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup,
-                                       "article__header__date",
-                                       "span")
+                                       "doc_header__time",
+                                       "div")
 
 
 def get_url_date_iso(url: str) -> Optional[datetime]:

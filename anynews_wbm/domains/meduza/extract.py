@@ -2,15 +2,19 @@
 import datetime
 import re
 from typing import List, Optional
+from bs4 import BeautifulSoup
 
 from anynews_wbm.extaction.extraction import BaseExtractor
 from anynews_wbm.extaction.utils import text_tags_class_pattern
 
 
-class MeduzaExtractor:
+class MeduzaExtractor(BaseExtractor):
     """Meduza extractor."""
 
-    def __init__(self, soup, url):
+    def __init__(self, soup: BeautifulSoup, url: str):
+        super().__init__(soup, url)
+
+        self.extractor: BaseExtractor
 
         if self.is_feature(url):
             self.extractor = MeduzaExtractorFeature(soup, url)
@@ -29,32 +33,39 @@ class MeduzaExtractor:
 
     @staticmethod
     def generate_pattern(name: str) -> re.Pattern:
+        """Generates pattern for meduza section detection."""
         pat = (r"(?:https://|http://){0,1}(?:www.){0,1}meduza.io/"
                + name
                + r"/.*")
         return re.compile(pat)
 
     def is_short(self, url: str) -> bool:
+        """Check url is 'short' section."""
         matching = self.generate_pattern("short").fullmatch(url)
         return matching is not None
 
     def is_cards(self, url: str) -> bool:
+        """Check url is 'cards' section."""
         matching = self.generate_pattern("cards").fullmatch(url)
         return matching is not None
 
     def is_feature(self, url: str) -> bool:
+        """Check url is 'feature' section."""
         matching = self.generate_pattern("feature").fullmatch(url)
         return matching is not None
 
     def is_news(self, url: str) -> bool:
+        """Check url is 'news' section."""
         matching = self.generate_pattern("news").fullmatch(url)
         return matching is not None
 
     def is_shapito(self, url: str) -> bool:
+        """Check url is 'shapito' section."""
         matching = self.generate_pattern("shapito").fullmatch(url)
         return matching is not None
 
     def is_slides(self, url: str) -> bool:
+        """Check url is 'slides' section."""
         matching = self.generate_pattern("slides").fullmatch(url)
         return matching is not None
 
@@ -63,15 +74,19 @@ class MeduzaExtractor:
         return self.extractor.get_text()
 
     def get_title(self) -> str:
+        """Get title."""
         return self.extractor.get_title()
 
     def get_authors(self) -> List[str]:
+        """Get authors."""
         return self.extractor.get_authors()
 
     def get_datetime(self) -> Optional[datetime.datetime]:
+        """Get datetime."""
         return self.extractor.get_datetime()
 
     def get_header_datetime(self) -> str:
+        """Get datetime from header."""
         return self.extractor.get_header_datetime()
 
 
