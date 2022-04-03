@@ -7,9 +7,9 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from scrapy.utils.log import configure_logging
 
-from anynews_wbm.domains.rbc.extract import RbcExtractor
-from anynews_wbm.extaction.extraction import BaseExtractor
-from anynews_wbm.waybackmachine.spiders.base import SpiderWaybackMachineBase
+from wbm_newspapers.domains.rbc.extract import RbcExtractor
+from wbm_newspapers.extaction.extraction import BaseExtractor
+from wbm_newspapers.waybackmachine.spiders.base import SpiderWaybackMachineBase
 
 configure_logging(install_root_handler=False)
 
