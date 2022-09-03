@@ -6,14 +6,14 @@ from typing import List, Optional
 from bs4 import BeautifulSoup
 
 
-class BaseSnapshotTransfrom(metaclass=abc.ABCMeta):  # pylint: disable=too-few-public-methods
+class BaseSnapshotTransform(metaclass=abc.ABCMeta):  # pylint: disable=too-few-public-methods
     """Transform BeautifulSoup object."""
 
     def __call__(self, soup: BeautifulSoup) -> BeautifulSoup:
         """Transform"""
 
 
-class SnapshotTransformPipeline(BaseSnapshotTransfrom):  # pylint: disable=too-few-public-methods
+class SnapshotTransformPipeline(BaseSnapshotTransform):  # pylint: disable=too-few-public-methods
     """Transformations pipeline."""
 
     def __init__(self, transforms: Iterable):
@@ -31,7 +31,7 @@ class SnapshotTransformPipeline(BaseSnapshotTransfrom):  # pylint: disable=too-f
         return soup
 
 
-class RemoveTagsByName(BaseSnapshotTransfrom):  # pylint: disable=too-few-public-methods
+class RemoveTagsByName(BaseSnapshotTransform):  # pylint: disable=too-few-public-methods
     """Remove tags with specified names."""
 
     def __init__(self, names: Optional[List[str]] = None):
@@ -52,7 +52,7 @@ class RemoveTagsByName(BaseSnapshotTransfrom):  # pylint: disable=too-few-public
         return soup
 
 
-class RemoveSpanNotDropcap(BaseSnapshotTransfrom):  # pylint: disable=too-few-public-methods
+class RemoveSpanNotDropcap(BaseSnapshotTransform):  # pylint: disable=too-few-public-methods
     """Remove span tags if their text length is not 1."""
 
     def __call__(self, soup: BeautifulSoup) -> BeautifulSoup:

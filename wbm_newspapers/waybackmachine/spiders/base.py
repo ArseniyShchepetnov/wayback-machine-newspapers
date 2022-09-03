@@ -10,7 +10,7 @@ import yaml
 from bs4 import BeautifulSoup
 from waybackmachine_cdx import WaybackMachineCDX
 
-from wbm_newspapers.extaction.extraction import BaseExtractor
+from wbm_newspapers.extraction.extraction import BaseExtractor
 from wbm_newspapers.waybackmachine import settings
 from wbm_newspapers.waybackmachine.items import \
     WaybackMachineGeneralArticleItem

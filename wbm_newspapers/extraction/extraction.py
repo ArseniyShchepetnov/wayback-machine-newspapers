@@ -5,11 +5,11 @@ from typing import List, Optional
 
 from bs4 import BeautifulSoup
 
-from wbm_newspapers.extaction.transforms import (BaseSnapshotTransfrom,
-                                                 RemoveSpanNotDropcap,
-                                                 RemoveTagsByName,
-                                                 SnapshotTransformPipeline)
-from wbm_newspapers.extaction.utils import normalize_string
+from wbm_newspapers.extraction.transforms import (BaseSnapshotTransform,
+                                                  RemoveSpanNotDropcap,
+                                                  RemoveTagsByName,
+                                                  SnapshotTransformPipeline)
+from wbm_newspapers.extraction.utils import normalize_string
 
 
 class BaseExtractor(metaclass=abc.ABCMeta):
@@ -35,7 +35,7 @@ class BaseExtractor(metaclass=abc.ABCMeta):
         return normalize_string(self.soup.get_text(" "))
 
     @staticmethod
-    def preprocess_pipeline() -> BaseSnapshotTransfrom:
+    def preprocess_pipeline() -> BaseSnapshotTransform:
         """Returns default preprocess pipeline."""
         return SnapshotTransformPipeline([
             RemoveTagsByName(['script', 'img', 'svg', 'style', 'button']),

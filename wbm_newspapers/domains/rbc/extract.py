@@ -3,18 +3,18 @@ import re
 from datetime import datetime
 from typing import List, Optional
 
-from wbm_newspapers.extaction.extraction import BaseExtractor
-from wbm_newspapers.extaction.transforms import (BaseSnapshotTransfrom,
+from wbm_newspapers.extraction.extraction import BaseExtractor
+from wbm_newspapers.extraction.transforms import (BaseSnapshotTransform,
                                                  RemoveTagsByName,
                                                  SnapshotTransformPipeline)
-from wbm_newspapers.extaction.utils import text_tags_class_pattern
+from wbm_newspapers.extraction.utils import text_tags_class_pattern
 
 
 class RbcExtractor(BaseExtractor):
     """Extractor from rbc.ru newspaper."""
 
     @staticmethod
-    def preprocess_pipeline() -> BaseSnapshotTransfrom:
+    def preprocess_pipeline() -> BaseSnapshotTransform:
         """Returns default preprocess pipeline."""
         return SnapshotTransformPipeline([
             RemoveTagsByName(['script', 'img', 'svg', 'style', 'button'])
