@@ -4,8 +4,8 @@ import re
 from typing import List, Optional
 from bs4 import BeautifulSoup
 
-from wbm_newspapers.extaction.extraction import BaseExtractor
-from wbm_newspapers.extaction.utils import text_tags_class_pattern
+from wbm_newspapers.extraction.extraction import BaseExtractor
+from wbm_newspapers.extraction.utils import text_tags_class_pattern
 
 
 class MeduzaExtractor(BaseExtractor):
