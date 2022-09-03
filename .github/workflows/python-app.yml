@@ -25,9 +25,6 @@ jobs:
           cache: "poetry"
       - run: poetry install
 
-      - name: Configure poetry
-        run: poetry config virtualenvs.in-project true
-
       - name: Install dependencies
         run: |
           poetry install
