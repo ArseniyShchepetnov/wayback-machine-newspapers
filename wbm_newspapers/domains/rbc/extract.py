@@ -5,10 +5,11 @@ from typing import List, Optional
 
 from wbm_newspapers.extraction.extraction import BaseExtractor
 from wbm_newspapers.extraction.transforms import (BaseSnapshotTransform,
+                                                  RemoveTagsByClass,
                                                   RemoveTagsByName,
-                                                  SnapshotTransformPipeline,
-                                                  RemoveTagsByClass)
-from wbm_newspapers.extraction.utils import text_tags_class_pattern, normalize_string
+                                                  SnapshotTransformPipeline)
+from wbm_newspapers.extraction.utils import (normalize_string,
+                                             text_tags_class_pattern)
 
 
 class RbcExtractor(BaseExtractor):

@@ -19,7 +19,7 @@ class SnapshotTransformPipeline(BaseSnapshotTransform):  # pylint: disable=too-f
     """Transformations pipeline."""
 
     def __init__(self,
-                 transforms: Iterable[BaseSnapshotTransform],
+                 transforms: Iterable,
                  inplace: bool = True):
         """
         Parameters
