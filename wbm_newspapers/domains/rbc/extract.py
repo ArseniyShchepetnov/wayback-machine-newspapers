@@ -5,9 +5,11 @@ from typing import List, Optional
 
 from wbm_newspapers.extraction.extraction import BaseExtractor
 from wbm_newspapers.extraction.transforms import (BaseSnapshotTransform,
-                                                 RemoveTagsByName,
-                                                 SnapshotTransformPipeline)
-from wbm_newspapers.extraction.utils import text_tags_class_pattern
+                                                  RemoveTagsByClass,
+                                                  RemoveTagsByName,
+                                                  SnapshotTransformPipeline)
+from wbm_newspapers.extraction.utils import (normalize_string,
+                                             text_tags_class_pattern)
 
 
 class RbcExtractor(BaseExtractor):
@@ -21,9 +23,25 @@ class RbcExtractor(BaseExtractor):
         ])
 
     def get_text(self) -> str:
-        text = text_tags_class_pattern(self.soup,
-                                       "article__text.*",
-                                       "div")
+
+        filt = SnapshotTransformPipeline([
+            RemoveTagsByName(["span"]),
+            RemoveTagsByClass(["div"], "article__inline.*"),
+            RemoveTagsByClass(["div"], "article__text__overview")
+        ], inplace=False)
+
+        tags = self.soup.find_all(
+            "div",
+            class_=lambda x: x and re.fullmatch("article__text.*", x))
+
+        tags = [filt(t) for t in tags]
+        tag_text = [
+            "\n".join([p.get_text() for p in t.find_all(["p"])])
+            for t in tags
+        ]
+
+        text = "\n".join(tag_text)
+        text = normalize_string(text)
         return text
 
     def get_title(self) -> str:
@@ -41,6 +59,11 @@ class RbcExtractor(BaseExtractor):
         return text_tags_class_pattern(self.soup,
                                        "article__header__date",
                                        "span")
+
+    def get_summary(self) -> str:
+        return text_tags_class_pattern(self.soup,
+                                       "article__text__overview",
+                                       "div")
 
 
 def get_url_date_iso(url: str) -> Optional[datetime]:

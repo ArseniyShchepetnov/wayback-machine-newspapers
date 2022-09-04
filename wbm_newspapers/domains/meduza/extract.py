@@ -89,6 +89,9 @@ class MeduzaExtractor(BaseExtractor):
         """Get datetime from header."""
         return self.extractor.get_header_datetime()
 
+    def get_summary(self) -> str:
+        return self.extractor.get_summary()
+
 
 class MeduzaExtractorSlides(BaseExtractor):
     """Extract from meduza cards."""
@@ -109,6 +112,9 @@ class MeduzaExtractorSlides(BaseExtractor):
 
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup, "Timestamp.*", "time")
+
+    def get_summary(self) -> str:
+        return ""
 
 
 class MeduzaExtractorShapito(BaseExtractor):
@@ -133,6 +139,9 @@ class MeduzaExtractorShapito(BaseExtractor):
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup, "Timestamp.*", "time")
 
+    def get_summary(self) -> str:
+        return ""
+
 
 class MeduzaExtractorNews(BaseExtractor):
     """Extract from meduza cards."""
@@ -153,6 +162,9 @@ class MeduzaExtractorNews(BaseExtractor):
 
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup, "Timestamp.*", "time")
+
+    def get_summary(self) -> str:
+        return ""
 
 
 class MeduzaExtractorFeature(BaseExtractor):
@@ -175,6 +187,9 @@ class MeduzaExtractorFeature(BaseExtractor):
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup, "Timestamp.*", "time")
 
+    def get_summary(self) -> str:
+        return ""
+
 
 class MeduzaExtractorShort(BaseExtractor):
     """Extract from meduza cards."""
@@ -194,6 +209,9 @@ class MeduzaExtractorShort(BaseExtractor):
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup, "Timestamp.*", "time")
 
+    def get_summary(self) -> str:
+        return ""
+
 
 class MeduzaExtractorCards(BaseExtractor):
     """Extract from meduza cards."""
@@ -212,6 +230,9 @@ class MeduzaExtractorCards(BaseExtractor):
 
     def get_header_datetime(self) -> str:
         return text_tags_class_pattern(self.soup, "Timestamp.*", "time")
+
+    def get_summary(self) -> str:
+        return ""
 
 
 def get_url_date_iso(url: str) -> Optional[datetime.datetime]:

@@ -115,7 +115,10 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
         self._special_settings = scraper_settings
 
         filter_original = self.special_settings().get('filter_original')
-        if filter_original is not None and filter_original:
+        enable_mongodb = self.special_settings().get('enable_mongodb', True)
+
+        self._db: Optional[SpiderDatabase] = None
+        if filter_original is not None and filter_original and enable_mongodb:
             db_settings = self.special_settings().get('db', {})
             self._db = SpiderDatabase(
                 self.name,
@@ -228,6 +231,7 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
 
         text = extractor.get_text()
         title = extractor.get_title()
+        summary = extractor.get_summary()
 
         if len(text) > 0 and len(title) == 0:
             logger.error("Title length is zero for url '%s'. Text length = %d",
@@ -252,6 +256,7 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
             item = WaybackMachineGeneralArticleItem(
                 text=text,
                 title=title,
+                summary=summary,
                 publish_date='',
                 title_date=title_date,
                 url_date=url_date,

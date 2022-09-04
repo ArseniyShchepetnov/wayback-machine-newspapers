@@ -1,5 +1,7 @@
 """Snapshot transformations."""
 import abc
+import copy
+import re
 from collections.abc import Iterable
 from typing import List, Optional
 
@@ -16,7 +18,9 @@ class BaseSnapshotTransform(metaclass=abc.ABCMeta):  # pylint: disable=too-few-p
 class SnapshotTransformPipeline(BaseSnapshotTransform):  # pylint: disable=too-few-public-methods
     """Transformations pipeline."""
 
-    def __init__(self, transforms: Iterable):
+    def __init__(self,
+                 transforms: Iterable,
+                 inplace: bool = True):
         """
         Parameters
         ----------
@@ -24,8 +28,12 @@ class SnapshotTransformPipeline(BaseSnapshotTransform):  # pylint: disable=too-f
             List of transformations.
         """
         self._transforms = transforms
+        self.inplace = inplace
 
     def __call__(self, soup: BeautifulSoup) -> BeautifulSoup:
+        if not self.inplace:
+            soup = copy.copy(soup)
+
         for func in self._transforms:
             soup = func(soup)
         return soup
@@ -61,4 +69,32 @@ class RemoveSpanNotDropcap(BaseSnapshotTransform):  # pylint: disable=too-few-pu
             if len(tag.text.strip()) != 1:
                 tag.extract()
 
+        return soup
+
+
+class RemoveTagsByClass(BaseSnapshotTransform):  # pylint: disable=too-few-public-methods
+    """Remove tags with specified names."""
+
+    def __init__(self,
+                 names: List[str],
+                 class_: str,
+                 inline: bool = False):
+        """
+        Parameters
+        ----------
+        names : Optional[List[str]], optional
+            Names, by default None.
+            If None names are ['script', 'img', 'svg', 'style'].
+        """
+        self._names = names
+        self.class_ = class_
+        self.inline = inline
+
+    def __call__(self, soup: BeautifulSoup) -> BeautifulSoup:
+        if not self.inline:
+            soup = copy.copy(soup)
+        for tag in soup.find_all(
+                name=self._names,
+                class_=lambda x: x and re.findall(self.class_, x)):
+            tag.extract()
         return soup
