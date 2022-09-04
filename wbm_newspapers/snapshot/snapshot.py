@@ -9,6 +9,7 @@ class SnapshotData:  # pylint: disable=too-many-instance-attributes
 
     text: str
     title: str
+    summary: str
     publish_date: str
     title_date: str
     url_date: str
