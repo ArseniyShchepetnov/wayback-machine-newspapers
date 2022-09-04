@@ -61,3 +61,7 @@ class BaseExtractor(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_header_datetime(self) -> str:
         """Get datetime from header."""
+
+    @abc.abstractmethod
+    def get_summary(self) -> str:
+        """Article summary."""

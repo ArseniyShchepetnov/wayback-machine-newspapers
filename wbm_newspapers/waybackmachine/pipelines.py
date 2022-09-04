@@ -122,7 +122,7 @@ class JsonWriterPipeline:
         """Save snapshot to the output path."""
         outpath = os.path.join(outpath, 'snapshot.html')
         with open(outpath, 'w', encoding='utf-8') as fobj:
-            fobj.write(snapshot)
+            json.dump(snapshot, fobj, indent=4)
 
 
 class MongodbWriterPipeline:
