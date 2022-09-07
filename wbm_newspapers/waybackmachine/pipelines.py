@@ -101,28 +101,17 @@ class JsonWriterPipeline:
 
         output_dir = self.output_dir(spider)
 
-        item_dict = ItemAdapter(item).asdict()
-
-        to_json = {
+        adapter_dict = ItemAdapter(item).asdict()
+        data = {
             key: val
-            for key, val in item_dict.items()
+            for key, val in adapter_dict.items()
             if key != 'snapshot'
         }
 
-        outdir = path_from_url(item_dict['url'], output_dir)
-        outpath = os.path.join(outdir, 'meta.json')
-        with open(outpath, 'w', encoding=self.encoding) as fobj:
-            json.dump(to_json, fobj, ensure_ascii=False, indent=4)
+        snapshot = Snapshot.from_dict(data, snapshot=adapter_dict['snapshot'])
 
-        self.save_snapshot(item_dict, outdir)
-
-        return item
-
-    def save_snapshot(self, snapshot: str, outpath: str):  # pylint: disable=no-self-use
-        """Save snapshot to the output path."""
-        outpath = os.path.join(outpath, 'snapshot.html')
-        with open(outpath, 'w', encoding='utf-8') as fobj:
-            json.dump(snapshot, fobj, indent=4)
+        outdir = path_from_url(data['url'], output_dir)
+        snapshot.save(outdir)
 
 
 class MongodbWriterPipeline:

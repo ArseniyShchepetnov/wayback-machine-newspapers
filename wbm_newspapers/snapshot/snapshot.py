@@ -1,6 +1,8 @@
 """Snapshot class."""
-from typing import Dict, Optional, List
 import dataclasses
+import json
+import os
+from typing import Dict, List, Optional
 
 
 @dataclasses.dataclass(frozen=True)
@@ -87,3 +89,16 @@ class Snapshot:
         """Construct snapshot from dictionary with data."""
         snapshot_data = SnapshotData(**data)
         return cls(snapshot_data, **kwargs)
+
+    def save(self, path: str, encoding: str = "utf-8"):
+        """Save snapshot."""
+        to_json = dataclasses.asdict(self.data)
+
+        file = os.path.join(path, 'data.json')
+        with open(file, 'w', encoding=encoding) as fobj:
+            json.dump(to_json, fobj, ensure_ascii=False, indent=4)
+
+        if self._snapshot is not None:
+            file = os.path.join(path, 'snapshot.html')
+            with open(file, 'w', encoding='utf-8') as fobj:
+                fobj.write(self._snapshot)
