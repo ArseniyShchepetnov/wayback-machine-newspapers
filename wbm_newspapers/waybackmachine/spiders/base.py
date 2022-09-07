@@ -221,7 +221,7 @@ class SpiderWaybackMachineBase(scrapy.Spider, metaclass=abc.ABCMeta):
 
         self.counter['parse'] += 1
 
-        soup = BeautifulSoup(response.text)
+        soup = BeautifulSoup(response.text, features="lxml")
         url_pars = WaybackMachineResponseCDX.from_archive_url(response.url)
         url_original = url_pars['original']
 
