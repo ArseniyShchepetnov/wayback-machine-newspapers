@@ -6,7 +6,7 @@ authors = ["Arseniy Shchepetnov <a.shchepetnov@gmail.com>"]
 license = "GPL-3.0-or-later"
 
 [tool.poetry.dependencies]
-python = ">=3.8.6,<4.0"
+python = ">=3.7,<4.0"
 pylint = "^2.11.1"
 Scrapy = "^2.5.1"
 autopep8 = "^1.6.0"
