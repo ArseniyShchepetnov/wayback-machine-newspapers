@@ -23,11 +23,7 @@ jobs:
         with:
           python-version: "3.8"
           cache: "poetry"
-      - run: poetry install
-
-      - name: Install dependencies
-        run: |
-          poetry install
+        run: poetry install
 
       - name: Lint with pylint
         run: |
