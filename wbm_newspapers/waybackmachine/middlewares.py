@@ -23,7 +23,7 @@ class WaybackmachineSpiderMiddleware:
                                 signal=signals.spider_opened)
         return class_
 
-    def process_spider_input(self, response, spider):  # pylint: disable=unused-argument,no-self-use
+    def process_spider_input(self, response, spider):  # pylint: disable=unused-argument
         """
         Called for each response that goes through the spider
         middleware and into the spider.
@@ -32,7 +32,7 @@ class WaybackmachineSpiderMiddleware:
         """
         return None
 
-    def process_spider_output(self, response, result, spider):  # pylint: disable=unused-argument,no-self-use
+    def process_spider_output(self, response, result, spider):  # pylint: disable=unused-argument
         """
         Called with the results returned from the Spider, after
         it has processed the response.
@@ -50,7 +50,7 @@ class WaybackmachineSpiderMiddleware:
         Should return either None or an iterable of Request or item objects.
         """
 
-    def process_start_requests(self, start_requests, spider):  # pylint: disable=unused-argument,no-self-use
+    def process_start_requests(self, start_requests, spider):  # pylint: disable=unused-argument
         """
         Called with the start requests of the spider, and works
         similarly to the process_spider_output() method, except
@@ -81,7 +81,7 @@ class WaybackmachineDownloaderMiddleware:
                                 signal=signals.spider_opened)
         return class_
 
-    def process_request(self, request, spider):  # pylint: disable=unused-argument,no-self-use
+    def process_request(self, request, spider):  # pylint: disable=unused-argument
         """
         Called for each request that goes through the downloader
         middleware.
@@ -95,7 +95,7 @@ class WaybackmachineDownloaderMiddleware:
         """
         return None
 
-    def process_response(self, request, response, spider):  # pylint: disable=unused-argument,no-self-use
+    def process_response(self, request, response, spider):  # pylint: disable=unused-argument
         """
         Called with the response returned from the downloader.
 
