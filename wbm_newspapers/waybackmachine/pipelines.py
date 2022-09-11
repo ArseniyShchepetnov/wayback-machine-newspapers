@@ -9,7 +9,6 @@ import logging
 import os
 import shutil
 from typing import Any
-from urllib.parse import urlparse
 
 import scrapy
 from itemadapter import ItemAdapter
@@ -18,20 +17,9 @@ from wbm_newspapers.snapshot.db.client import (DbClient,
                                                SnapshotCollectionClient)
 from wbm_newspapers.snapshot.snapshot import Snapshot
 from wbm_newspapers.waybackmachine.spiders.base import SpiderWaybackMachineBase
+from wbm_newspapers.waybackmachine.utils import url2path
 
 logger = logging.getLogger(__name__)
-
-
-def url2path(url: str) -> str:
-    """Convert URL to the path."""
-    url_path = urlparse(url).path
-    exclude = ['http:', 'https:']
-    url_list = url_path.split('/')
-    url_list = list(filter(lambda s: len(s) > 0 and s not in exclude,
-                           url_list))
-    url_list = url_list[1:]
-    path = os.path.join(*url_list)
-    return path
 
 
 def path_from_url(url: str, root_path: str) -> str:
@@ -120,9 +108,7 @@ class MongodbWriterPipeline:
     DATABASE = 'anynews_wbm'
 
     def __init__(self):
-
         self.client = None
-        self.db = None
 
     def open_spider(self, spider: SpiderWaybackMachineBase):
         """Open spider."""

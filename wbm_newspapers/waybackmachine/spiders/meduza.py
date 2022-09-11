@@ -1,10 +1,5 @@
 """Meduza site scraping."""
 import logging
-import os
-import re
-from datetime import datetime
-from typing import Optional
-from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 from scrapy.utils.log import configure_logging
@@ -31,29 +26,3 @@ class SpiderMeduza(SpiderWaybackMachineBase):
 
     def get_extractor(self, soup: BeautifulSoup, url: str) -> BaseExtractor:
         return MeduzaExtractor(soup, url)
-
-
-def url2path(url: str) -> str:
-    """Convert URL string to path."""
-    url_path = urlparse(url).path
-
-    exclude = ['http:', 'https:']
-    url_list = url_path.split('/')
-    url_list = list(filter(lambda s: len(s) > 0 and s not in exclude,
-                           url_list))
-
-    url_list = url_list[1:]
-    path = os.path.join(*url_list)
-
-    return path
-
-
-def get_url_date_iso(url: str) -> Optional[str]:
-    """Try to get ISO date from URL."""
-    result = None
-    match = re.search(r"/\d{4}/\d{2}/\d{2}/", url)
-    if match is not None:
-        data = match.group()
-        date = datetime.strptime(data, r'/%Y/%m/%d/')
-        result = date.isoformat()
-    return result

@@ -19,15 +19,11 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.7"
           cache: "poetry"
       - run: poetry install
-
-      - name: Install dependencies
-        run: |
-          poetry install
 
       - name: Lint with pylint
         run: |
