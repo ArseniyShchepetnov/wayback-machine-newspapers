@@ -61,7 +61,7 @@ class WaybackmachineSpiderMiddleware:
         for req in start_requests:
             yield req
 
-    def spider_opened(self, spider):  # pylint: disable=no-self-use
+    def spider_opened(self, spider):
         """Open spider."""
         spider.logger.info('Spider opened: %s', spider.name)
 
@@ -117,6 +117,6 @@ class WaybackmachineDownloaderMiddleware:
         - return a Request object: stops process_exception() chain
         """
 
-    def spider_opened(self, spider):  # pylint: disable=no-self-use
+    def spider_opened(self, spider):
         """Opened spider."""
         spider.logger.info('Spider opened: %s', spider.name)
