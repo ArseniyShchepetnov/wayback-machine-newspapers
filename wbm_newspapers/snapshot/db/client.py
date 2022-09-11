@@ -36,7 +36,7 @@ class DbClient:
         self._db = self._client[self.DATABASE]
 
     @property
-    def db(self):
+    def db(self):  # pylint: disable=invalid-name
         """Return database object."""
         return self._db
 
@@ -56,7 +56,7 @@ class SnapshotCollectionClient:
     _origin_postfix: str = "_origin"
     _special_fields = ['_id']
 
-    def __init__(self, db: DbClient, name: str):
+    def __init__(self, db: DbClient, name: str):  # pylint: disable=invalid-name
         """
         Parameters
         ----------
@@ -72,7 +72,7 @@ class SnapshotCollectionClient:
         self._o_collection = self._db.db[self.name_origin]
 
     @property
-    def db(self):
+    def db(self):  # pylint: disable=invalid-name
         """Get database object."""
         return self._db
 

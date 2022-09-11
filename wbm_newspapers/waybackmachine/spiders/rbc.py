@@ -34,6 +34,7 @@ class SpiderRBC(SpiderWaybackMachineBase):
 
 def get_url_date_iso(url: str) -> Optional[str]:
     """Try to get ISO date from URL."""
+    # pylint: disable=duplicate-code
     result = None
     match = re.search(r"/\d{2}/\d{2}/\d{4}/", url)
     if match is not None:
