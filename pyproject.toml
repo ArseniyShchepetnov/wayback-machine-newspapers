@@ -20,7 +20,7 @@ beautifulsoup4 = "^4.10.0"
 PyYAML = "^6.0"
 matplotlib = "^3.5.1"
 nltk = "^3.6.7"
-waybackmachine-cdx = {git = "https://github.com/ArseniyShchepetnov/waybackmachine-cdx.git"}
+waybackmachine-cdx = {git = "https://github.com/ArseniyShchepetnov/waybackmachine-cdx.git", tag = "v0.1.0"}
 
 [tool.poetry.dev-dependencies]
 pylint = ">=2.15.2"
