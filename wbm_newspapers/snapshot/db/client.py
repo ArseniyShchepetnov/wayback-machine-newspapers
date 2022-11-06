@@ -1,8 +1,10 @@
 """Client for database with snapshot."""
 import logging
-from typing import List, Optional, Iterator
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import pymongo
+from bson.objectid import ObjectId
+
 from wbm_newspapers.snapshot.snapshot import Snapshot
 
 logger = logging.getLogger(__file__)
@@ -170,9 +172,9 @@ class SnapshotCollectionClient:
         for doc in self._collection.find({}):
             yield doc["title"]
 
-    def all_documents(self) -> pymongo.cursor.Cursor:
+    def all_documents(self, fields: Dict[str, Any]) -> pymongo.cursor.Cursor:
         """Returns cursor over all documents."""
-        return self._collection.find({})
+        return self._collection.find({}, projection=fields)
 
     def iterate_snapshots(self, query):
         """Iterate over snapshots using collection `find` method."""
@@ -210,8 +212,6 @@ class SnapshotCollectionClient:
         if not has_similar:
             data = snapshot.data_dict()
             self._collection.insert_one(data)
-            snapshot = snapshot.snapshot_dict()
-            self._o_collection.insert_one(snapshot)
             logger.debug("Write to database")
 
     def find_original_url(self, url: str) -> List[Snapshot]:
@@ -219,3 +219,17 @@ class SnapshotCollectionClient:
         cursor = self._collection.find({"original": url})
         result = self.cursor2snapshots(cursor)
         return result
+
+    def get_ids(self, query: Optional[Dict[str, Any]] = None) -> List[str]:
+        """Get ids selected by query"""
+        if query is None:
+            query = {}
+        cursor = self._collection.find(query, projection={"_id": True})
+        return [item["_id"] for item in cursor]
+
+    def get_snapshots_by_id(self, id_: Union[str, ObjectId]) -> List[Snapshot]:
+        """Get snapshot by its `_id` field in mongodb."""
+        if isinstance(id_, str):
+            id_ = ObjectId(id_)
+        cursor = self._collection.find({"_id": id_})
+        return self.cursor2snapshots(cursor)
