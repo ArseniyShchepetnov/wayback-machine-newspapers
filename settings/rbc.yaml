@@ -1,7 +1,7 @@
 cdx:
   url: www.rbc.ru
   from_dt: "2019-01-01 00:00:00"
-  limits: 1000
+  limits: 100000
   match_type: "prefix"
 filter:
   include_url:

@@ -1,14 +1,14 @@
 cdx:
   url: https://meduza.io/
   from_dt: "2019-01-01 00:00:00"
-  limits: 10000
+  limits: 100000
   match_type: "prefix"
 filter:
   include_url:
   exclude_url:
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/robots.txt$
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/static/.*$
-    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/{0,1}\s*$
+    - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/{0,2}\s*$
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/games.*$
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/{1,2}en/{0,1}.*$
     - .+://mailto:.+
@@ -25,6 +25,8 @@ filter:
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/galleries/.*
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/video/.*
     - (?:https://|http://){0,1}(?:www.){0,1}meduza.io(?:\:80){0,1}/(survey|stat|special)/.*
+    - https://meduza\.io/\?(utm_source|utm_medium|google_preview)=.*
+    - https://meduza\.io/\.\.\./.*
   exclude_statuscodes: ["404"]
   include_mimetypes: ["text/html"]
 
