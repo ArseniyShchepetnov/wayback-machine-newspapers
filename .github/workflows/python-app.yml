@@ -29,6 +29,6 @@ jobs:
         run: |
           poetry run pylint wbm_newspapers --fail-under=10
 
-      - name: Test with pytest
-        run: |
-          poetry run pytest tests
+      # - name: Test with pytest
+      #   run: |
+      #     poetry run pytest tests
