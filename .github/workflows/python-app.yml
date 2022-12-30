@@ -29,7 +29,6 @@ jobs:
         run: |
           poetry run pylint wbm_newspapers --fail-under=10
 
-      - name: Test with pytest
-        run: |
-          sudo systemctl start mongod
-          poetry run pytest
+      # - name: Test with pytest
+      #   run: |
+      #     poetry run pytest tests

@@ -12,10 +12,9 @@ from typing import Any
 
 import scrapy
 from itemadapter import ItemAdapter
+from wbm_snapshot.db.client import DbClient, SnapshotCollectionClient
+from wbm_snapshot.snapshot import Snapshot
 
-from wbm_newspapers.snapshot.db.client import (DbClient,
-                                               SnapshotCollectionClient)
-from wbm_newspapers.snapshot.snapshot import Snapshot
 from wbm_newspapers.waybackmachine.spiders.base import SpiderWaybackMachineBase
 from wbm_newspapers.waybackmachine.utils import url2path
 
